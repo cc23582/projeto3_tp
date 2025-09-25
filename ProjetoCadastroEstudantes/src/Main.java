@@ -39,7 +39,8 @@ public class Main
                 case 2 : exclusao(); break;
                 case 3 : exibicao(); break;
                 case 4 : listagem();
-                case 5 : alterar(); break;
+                case 5 : alteracao(); break;
+                case 10 : fazEstatisticas();
             }
         }
         while (opcao != 0);
@@ -130,9 +131,9 @@ public class Main
         System.out.println();
     }
 
-    public static void alterar() throws Exception
+    public static void alteracao() throws Exception
     {
-        String  ra = "99999", novoCurso, novoNome;
+        String ra = "99999", novoCurso, novoNome;
 
         while (ra != "00000") {
             System.out.print("RA do estudante: (0) para terminar: ");
@@ -144,22 +145,33 @@ public class Main
 
                 if(!estud.existe(proc))
                 {
+                    System.out.println("Dados atuais:");
                     System.out.println("\nNão existe um estudante com este RA!");
                 }else {
                     System.out.println(estud.valorDe(estud.getOnde()));
 
                     System.out.print("Código do curso: [Enter] para pular ");
-                    int cursoDigitado = teclado.nextInt();
-                    novoCurso = String.format("%02d", cursoDigitado);
+                    int cursoLido = teclado.nextInt();
+                    novoCurso = String.format("%02d", cursoLido);
 
+                    if (!novoCurso.equals(""))
+                        estud
 
+                                .valorDe(estud.getOnde()).setCurso(novoCurso);
 
                     System.out.print("Nome do estudante: [Enter] para pular ");
                     novoNome = teclado.next();
+
+                    if (!novoNome.equals(""))
+                        estud.valorDe(estud.getOnde()).setCurso(novoNome);
                 }
             }
 
         }
+    }
+
+    public static void fazEstatisticas(){
+        int disciplina, maiorAprov, menorAprov, maiorMedia, maiorNota, menorNota,
         return;
     }
 
