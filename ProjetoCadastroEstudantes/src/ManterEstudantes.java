@@ -114,7 +114,7 @@ public class ManterEstudantes implements ManterDados
         if (posicaoDeAcesso >= 0 && posicaoDeAcesso < quantosDados)
             return dados[posicaoDeAcesso];
 
-        throw new IndexOutOfBoundsException("Índice inválido!");
+        throw new IndexOutOfBoundsException("Índice inválido!"); // -> erro que indica se o índice fornecido é negativo ou é maior ou igual ao tamanho da coleção
     }
 
     @Override

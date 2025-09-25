@@ -23,11 +23,12 @@ public class Main
             System.out.println("2 - Excluir estudantes");
             System.out.println("3 - Exibir estudantes");
             System.out.println("4 - Listar estudantes");
-            System.out.println("5 - Ir ao início");
-            System.out.println("6 - Ir ao proximo");
-            System.out.println("7 - Ir ao anterior");
-            System.out.println("8 - Ir ao último");
-            System.out.println("9 - Estatísticas");
+            System.out.println("5 - Alterar estudantes");
+            System.out.println("6 - Ir ao início");
+            System.out.println("7 - Ir ao proximo");
+            System.out.println("8 - Ir ao anterior");
+            System.out.println("9 - Ir ao último");
+            System.out.println("10 - Estatísticas");
             System.out.println("\nDigite o número da operação desejada:");
             opcao = teclado.nextInt();  // lê um inteiro pelo teclado
 
@@ -38,6 +39,7 @@ public class Main
                 case 2 : exclusao(); break;
                 case 3 : exibicao(); break;
                 case 4 : listagem();
+                case 5 : alterar(); break;
             }
         }
         while (opcao != 0);
@@ -104,7 +106,7 @@ public class Main
             System.out.print("RA do estudante: (0) para terminar: ");
             int raDigitado = teclado.nextInt();
             if (raDigitado != 0) {
-                ra = String.format("%05d", raDigitado);
+                ra = String.format("%05d", raDigitado);  //"%05d"-> coloca 0 para completar a string
                 // temos de pesquisar esse ra no vetor para descobrirmos
                 // em que índice ele está para podermos excluir desse índice
                 // criamos um objeto Estudante para poder chamar o método existe()
@@ -126,6 +128,39 @@ public class Main
         for (int indice=0; indice < estud.getTamanho(); indice++)
             System.out.println(estud.valorDe(indice));
         System.out.println();
+    }
+
+    public static void alterar() throws Exception
+    {
+        String  ra = "99999", novoCurso, novoNome;
+
+        while (ra != "00000") {
+            System.out.print("RA do estudante: (0) para terminar: ");
+            int raDigitado = teclado.nextInt();
+
+            if (raDigitado != 0) {
+                ra = String.format("%05d", raDigitado);
+                Estudante proc = new Estudante(ra);
+
+                if(!estud.existe(proc))
+                {
+                    System.out.println("\nNão existe um estudante com este RA!");
+                }else {
+                    System.out.println(estud.valorDe(estud.getOnde()));
+
+                    System.out.print("Código do curso: [Enter] para pular ");
+                    int cursoDigitado = teclado.nextInt();
+                    novoCurso = String.format("%02d", cursoDigitado);
+
+
+
+                    System.out.print("Nome do estudante: [Enter] para pular ");
+                    novoNome = teclado.next();
+                }
+            }
+
+        }
+        return;
     }
 
 }
