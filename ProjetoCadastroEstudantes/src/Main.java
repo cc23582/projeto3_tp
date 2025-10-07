@@ -40,6 +40,10 @@ public class Main
                 case 3 : exibicao(); break;
                 case 4 : listagem();
                 case 5 : alteracao(); break;
+                case 6 : irAoInicio();
+                case 7 : irAoProximo();
+                case 8 : irAoAnterior();
+                case 9 : irAoUltimo();
                 case 10 : fazEstatisticas();
             }
         }
@@ -145,9 +149,9 @@ public class Main
 
                 if(!estud.existe(proc))
                 {
-                    System.out.println("Dados atuais:");
                     System.out.println("\nNão existe um estudante com este RA!");
                 }else {
+                    System.out.println("Dados atuais:");
                     System.out.println(estud.valorDe(estud.getOnde()));
 
                     System.out.print("Código do curso: [Enter] para pular ");
@@ -155,12 +159,10 @@ public class Main
                     novoCurso = String.format("%02d", cursoLido);
 
                     if (!novoCurso.equals(""))
-                        estud
-
-                                .valorDe(estud.getOnde()).setCurso(novoCurso);
+                        estud.valorDe(estud.getOnde()).setNome(novoCurso);
 
                     System.out.print("Nome do estudante: [Enter] para pular ");
-                    novoNome = teclado.next();
+                    novoNome = teclado.nextLine();
 
                     if (!novoNome.equals(""))
                         estud.valorDe(estud.getOnde()).setCurso(novoNome);
@@ -170,6 +172,21 @@ public class Main
         }
     }
 
+    public static void irAoInicio()
+    {
+
+    }
+
+    public static void irAoProximo() {
+    }
+
+    public static void irAoAnterior(){
+
+    }
+
+    public static void irAoUltimo(){
+
+    }
     public static void fazEstatisticas(){
         int disciplina, maiorAprov, menorAprov, maiorMedia, maiorNota, menorNota,
         return;
