@@ -11,14 +11,14 @@ public class Main
         estud = new ManterEstudantes(15);
         teclado = new Scanner(System.in);
         lerSiglas(); // lê o arquivo de siglas
-        estud.lerDados("estudantes.txt");
+        estud.lerDados("src/estudantes.txt");
         estud.ordenar();
         seletorDeOpcoes();
-        estud.gravarDados("estudantes.txt");
+        estud.gravarDados("src/estudantes.txt");
     }
 
     public static void lerSiglas() throws Exception {
-        BufferedReader arq = new BufferedReader(new FileReader("siglasDisc.txt"));
+        BufferedReader arq = new BufferedReader(new FileReader("src/siglasDisc.txt"));
         for (int i = 0; i < 15; i++) {
             siglas[i] = arq.readLine();
         }
@@ -61,61 +61,80 @@ public class Main
     }
 
     public static void inclusao() throws Exception {
-        while (true) {
-            System.out.print("RA do estudante (0 para terminar): ");
+        String curso, ra = "99999", nome;
+        while (!ra.equals("00000"))
+        {
+            System.out.print("RA do estudante: (0) para terminar: ");
             int raDigitado = teclado.nextInt();
-            teclado.nextLine();
-            if (raDigitado == 0) break;
+            teclado.nextLine(); // limpa o \n pendente no buffer
 
-            String ra = String.format("%05d", raDigitado);
-            Estudante proc = new Estudante(ra);
-            if (estud.existe(proc)) {
-                System.out.println("\nRA repetido!");
+            if (raDigitado != 0) {
+                ra = String.format("%05d", raDigitado);
+
+                // verifica se já existe o RA
+                Estudante proc = new Estudante(ra);
+                if (estud.existe(proc)) {
+                    System.out.println("\nRA repetido!");
+                } else {
+                    System.out.print("Código do curso: ");
+                    int cursoLido = teclado.nextInt();
+                    teclado.nextLine(); // limpa o \n pendente novamente
+
+                    curso = String.format("%02d", cursoLido);
+
+                    System.out.print("Nome do estudante: ");
+                    nome = teclado.nextLine(); // permite nomes compostos
+
+                    // inclui em ordem crescente de RA
+                    estud.incluirEm(new Estudante(curso, ra, nome), estud.getOnde());
+                    System.out.println("\nEstudante incluído.");
+                }
             } else {
-                System.out.print("Código do curso: ");
-                int cursoLido = teclado.nextInt();
-                teclado.nextLine();
-                String curso = String.format("%02d", cursoLido);
-                System.out.print("Nome do estudante: ");
-                String nome = teclado.nextLine();
-                estud.incluirEm(new Estudante(curso, ra, nome), estud.getOnde());
-                System.out.println("\nEstudante incluído.");
+                ra = "00000"; // força saída do laço
             }
         }
     }
 
-    public static void exclusao() throws Exception {
-        while (true) {
-            System.out.print("RA do estudante (0 para terminar): ");
+    public static void exclusao() throws Exception
+    {
+        String ra = "99999";
+        while (ra != "00000") {
+            System.out.print("RA do estudante: (0) para terminar: ");
             int raDigitado = teclado.nextInt();
-            teclado.nextLine();
-            if (raDigitado == 0) break;
-
-            String ra = String.format("%05d", raDigitado);
-            Estudante proc = new Estudante(ra);
-            if (!estud.existe(proc))
-                System.out.println("\nRA não encontrado!");
-            else {
-                estud.excluir(estud.getOnde());
-                System.out.println("Estudante excluído.");
+            if (raDigitado != 0) {
+                ra = String.format("%05d", raDigitado);
+                // temos de pesquisar esse ra no vetor para descobrirmos
+                // em que índice ele está para podermos excluir desse índice
+                // criamos um objeto Estudante para poder chamar o método existe()
+                Estudante proc = new Estudante(ra);
+                if (!estud.existe(proc))     // ajusta valor de ondeEsta
+                    System.out.println("\nRA não encontrado!");
+                else  // ra não repetido, lemos os demais dados
+                {
+                    estud.excluir(estud.getOnde());
+                    System.out.println("Estudante excluído.");
+                }
             }
         }
     }
 
     public static void exibicao() throws Exception {
-        while (true) {
-            System.out.print("RA do estudante (0 para terminar): ");
+        String ra = "99999";
+        while (!ra.equals("00000")) {
+            System.out.print("RA do estudante: (0) para terminar: ");
             int raDigitado = teclado.nextInt();
-            teclado.nextLine();
-            if (raDigitado == 0) break;
-
-            String ra = String.format("%05d", raDigitado);
-            Estudante proc = new Estudante(ra);
-            if (!estud.existe(proc))
-                System.out.println("\nRA não encontrado!");
-            else {
-                System.out.println(cabecalhoNotas());
-                System.out.println(estud.valorDe(estud.getOnde()));
+            if (raDigitado != 0) {
+                ra = String.format("%05d", raDigitado);
+                Estudante proc = new Estudante(ra);
+                if (!estud.existe(proc)) {   // ajusta valor de ondeEsta
+                    System.out.println("\nRA não encontrado!");
+                } else {
+                    // mostra cabeçalho e estudante
+                    System.out.println(cabecalhoNotas());
+                    System.out.println(estud.valorDe(estud.getOnde()));
+                }
+            } else {
+                ra = "00000"; // encerra o laço
             }
         }
     }
@@ -123,8 +142,9 @@ public class Main
     public static void listagem() throws Exception {
         System.out.println("\nRelação de estudantes cadastrados:");
         System.out.println(cabecalhoNotas());
-        for (int i = 0; i < estud.getTamanho(); i++)
-            System.out.println(estud.valorDe(i));
+        for (int indice = 0; indice < estud.getTamanho(); indice++) {
+            System.out.println(estud.valorDe(indice));
+        }
         System.out.println();
     }
 
@@ -197,91 +217,153 @@ public class Main
             return;
         }
 
-        double[] somaNotas = new double[15];
-        int[] contNotas = new int[15];
-        int[] aprovados = new int[15];
-        int[] retidos = new int[15];
-
-        Estudante melhorAluno = null;
-        double maiorMedia = -1;
-
-        for (int i = 0; i < qtdEstudantes; i++) {
-            Estudante e = estud.valorDe(i);
-            double[] notas = e.getNotas();
-            int qn = e.getQuantasNotas();
-            double soma = 0;
-            for (int j = 0; j < qn; j++) {
-                soma += notas[j];
-                somaNotas[j] += notas[j];
-                contNotas[j]++;
-                if (notas[j] >= 6.0) aprovados[j]++;
-                else retidos[j]++;
-            }
-            double mediaAluno = soma / qn;
-            if (mediaAluno > maiorMedia) {
-                maiorMedia = mediaAluno;
-                melhorAluno = e;
-            }
-        }
-
-        double[] mediasDisc = new double[15];
-        for (int j = 0; j < 15; j++)
-            if (contNotas[j] > 0)
-                mediasDisc[j] = somaNotas[j] / contNotas[j];
-
-        int discMaisAprov = 0, discMaisRetidos = 0;
-        for (int j = 1; j < 15; j++) {
-            if (aprovados[j] > aprovados[discMaisAprov]) discMaisAprov = j;
-            if (retidos[j] > retidos[discMaisRetidos]) discMaisRetidos = j;
-        }
-
-        int discMaiorMedia = 0, discMenorMedia = 0;
-        for (int j = 1; j < 15; j++) {
-            if (mediasDisc[j] > mediasDisc[discMaiorMedia]) discMaiorMedia = j;
-            if (mediasDisc[j] < mediasDisc[discMenorMedia]) discMenorMedia = j;
-        }
-
         System.out.println("\n===== Estatísticas =====");
-        System.out.println("Disciplina com mais aprovações: " + siglas[discMaisAprov]);
-        System.out.println("Disciplina com mais retenções: " + siglas[discMaisRetidos]);
-        System.out.println("Aluno com maior média: " + melhorAluno.getNome().trim() +
+
+        //Dados básicos de cada disciplina
+        double[] mediasDisc = calculaMediasPorDisciplina();
+        int[] aprovados = contaAprovados();
+        int[] retidos = contaRetidos();
+
+        // Disciplinas com destaque
+        int discMaisAprov = indiceMaiorValor(aprovados);
+        int discMaisRetidos = indiceMaiorValor(retidos);
+        int discMaiorMedia = indiceMaiorValor(mediasDisc);
+        int discMenorMedia = indiceMenorValor(mediasDisc);
+
+        System.out.println("Disciplina com MAIS aprovações: " + siglas[discMaisAprov]);
+        System.out.println("Disciplina com MAIS retenções: " + siglas[discMaisRetidos]);
+
+        //Melhor aluno geral
+        Estudante melhorAluno = alunoComMaiorMedia();
+        System.out.println("Aluno com MAIOR média: " + melhorAluno.getNome().trim() +
                 " (" + melhorAluno.getRa().trim() + ") com média " +
-                String.format("%.2f", maiorMedia));
+                String.format("%.2f", melhorAluno.mediaDasNotas()));
 
-        double[] notasMelhor = melhorAluno.getNotas();
-        int qn = melhorAluno.getQuantasNotas();
-        int maiorNotaDisc = 0, menorNotaDisc = 0;
-        for (int j = 1; j < qn; j++) {
-            if (notasMelhor[j] > notasMelhor[maiorNotaDisc]) maiorNotaDisc = j;
-            if (notasMelhor[j] < notasMelhor[menorNotaDisc]) menorNotaDisc = j;
-        }
-        System.out.println("Maior nota do melhor aluno: " + siglas[maiorNotaDisc]);
-        System.out.println("Menor nota do melhor aluno: " + siglas[menorNotaDisc]);
+        //Disciplinas com maior e menor nota do melhor aluno
+        mostraMaiorEMenorNotaDoMelhorAluno(melhorAluno);
 
+        //Médias gerais
         System.out.println("\nMédias por disciplina:");
-        for (int j = 0; j < 15; j++)
-            if (contNotas[j] > 0)
-                System.out.printf("%-7s: %.2f\n", siglas[j], mediasDisc[j]);
+        for (int j = 0; j < siglas.length; j++)
+            System.out.printf("%-7s: %.2f\n", siglas[j], mediasDisc[j]);
 
-        double maiorNotaNaMenor = -1;
-        Estudante alunoMaiorNaMenor = null;
-        for (int i = 0; i < qtdEstudantes; i++) {
+        //Alunos com notas destaque nas disciplinas extremas
+        mostraDestaquesNasDisciplinasExtremas(discMenorMedia, discMaiorMedia);
+    }
+
+    /* ======== MÉTODOS AUXILIARES ======== */
+
+    // Calcula média aritmética das disciplinas
+    private static double[] calculaMediasPorDisciplina() throws Exception {
+        double[] soma = new double[15];
+        int[] cont = new int[15];
+
+        for (int i = 0; i < estud.getTamanho(); i++) {
             Estudante e = estud.valorDe(i);
             double[] notas = e.getNotas();
-            if (e.getQuantasNotas() > discMenorMedia &&
-                    notas[discMenorMedia] > maiorNotaNaMenor) {
+            for (int j = 0; j < e.getQuantasNotas(); j++) {
+                soma[j] += notas[j];
+                cont[j]++;
+            }
+        }
+
+        double[] medias = new double[15];
+        for (int j = 0; j < 15; j++)
+            medias[j] = cont[j] > 0 ? soma[j] / cont[j] : 0;
+        return medias;
+    }
+
+    // Conta quantos alunos foram aprovados (nota >= 6)
+    private static int[] contaAprovados() throws Exception {
+        int[] aprovados = new int[15];
+        for (int i = 0; i < estud.getTamanho(); i++) {
+            Estudante e = estud.valorDe(i);
+            for (int j = 0; j < e.getQuantasNotas(); j++)
+                if (e.getNotas()[j] >= 6) aprovados[j]++;
+        }
+        return aprovados;
+    }
+
+    // Conta quantos alunos foram retidos (nota < 6)
+    private static int[] contaRetidos() throws Exception {
+        int[] retidos = new int[15];
+        for (int i = 0; i < estud.getTamanho(); i++) {
+            Estudante e = estud.valorDe(i);
+            for (int j = 0; j < e.getQuantasNotas(); j++)
+                if (e.getNotas()[j] < 6) retidos[j]++;
+        }
+        return retidos;
+    }
+
+    // Retorna índice do maior valor em vetor de double
+    private static int indiceMaiorValor(double[] v) {
+        int indice = 0;
+        for (int i = 1; i < v.length; i++)
+            if (v[i] > v[indice]) indice = i;
+        return indice;
+    }
+
+    // Retorna índice do menor valor em vetor de double
+    private static int indiceMenorValor(double[] v) {
+        int indice = 0;
+        for (int i = 1; i < v.length; i++)
+            if (v[i] < v[indice]) indice = i;
+        return indice;
+    }
+
+    // Retorna índice do maior valor em vetor de int
+    private static int indiceMaiorValor(int[] v) {
+        int indice = 0;
+        for (int i = 1; i < v.length; i++)
+            if (v[i] > v[indice]) indice = i;
+        return indice;
+    }
+
+    // Retorna o aluno com a maior média geral
+    private static Estudante alunoComMaiorMedia() throws Exception {
+        Estudante melhor = null;
+        double maior = -1;
+        for (int i = 0; i < estud.getTamanho(); i++) {
+            Estudante e = estud.valorDe(i);
+            double media = e.mediaDasNotas();
+            if (media > maior) {
+                maior = media;
+                melhor = e;
+            }
+        }
+        return melhor;
+    }
+
+    // Exibe a disciplina de maior e menor nota do melhor aluno
+    private static void mostraMaiorEMenorNotaDoMelhorAluno(Estudante e) throws Exception {
+        double[] notas = e.getNotas();
+        int qn = e.getQuantasNotas();
+        int maior = 0, menor = 0;
+
+        for (int j = 1; j < qn; j++) {
+            if (notas[j] > notas[maior]) maior = j;
+            if (notas[j] < notas[menor]) menor = j;
+        }
+
+        System.out.println("Maior nota do melhor aluno: " + siglas[maior]);
+        System.out.println("Menor nota do melhor aluno: " + siglas[menor]);
+    }
+
+    // Mostra quem se destacou nas disciplinas com maior e menor média
+    private static void mostraDestaquesNasDisciplinasExtremas(int discMenorMedia, int discMaiorMedia) throws Exception {
+        double maiorNotaNaMenor = -1, menorNotaNaMaior = 11;
+        Estudante alunoMaiorNaMenor = null, alunoMenorNaMaior = null;
+
+        for (int i = 0; i < estud.getTamanho(); i++) {
+            Estudante e = estud.valorDe(i);
+            double[] notas = e.getNotas();
+
+            if (e.getQuantasNotas() > discMenorMedia && notas[discMenorMedia] > maiorNotaNaMenor) {
                 maiorNotaNaMenor = notas[discMenorMedia];
                 alunoMaiorNaMenor = e;
             }
-        }
 
-        double menorNotaNaMaior = 11;
-        Estudante alunoMenorNaMaior = null;
-        for (int i = 0; i < qtdEstudantes; i++) {
-            Estudante e = estud.valorDe(i);
-            double[] notas = e.getNotas();
-            if (e.getQuantasNotas() > discMaiorMedia &&
-                    notas[discMaiorMedia] < menorNotaNaMaior) {
+            if (e.getQuantasNotas() > discMaiorMedia && notas[discMaiorMedia] < menorNotaNaMaior) {
                 menorNotaNaMaior = notas[discMaiorMedia];
                 alunoMenorNaMaior = e;
             }
@@ -289,9 +371,10 @@ public class Main
 
         System.out.println("\nNa disciplina com MENOR média (" + siglas[discMenorMedia] +
                 "), o aluno com MAIOR nota foi: " + alunoMaiorNaMenor.getNome().trim() +
-                " (" + maiorNotaNaMenor + ")");
+                " (" + String.format("%.1f", maiorNotaNaMenor) + ")");
         System.out.println("Na disciplina com MAIOR média (" + siglas[discMaiorMedia] +
                 "), o aluno com MENOR nota foi: " + alunoMenorNaMaior.getNome().trim() +
-                " (" + menorNotaNaMaior + ")");
+                " (" + String.format("%.1f", menorNotaNaMaior) + ")");
     }
+
 }

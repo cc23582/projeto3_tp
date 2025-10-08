@@ -52,7 +52,7 @@ public class ManterEstudantes implements ManterDados
         }
         catch (Exception erroDeLeitura)
         {
-            System.out.println("Erro na leitura dos dados do arquivo");
+            System.out.println("Erro na leitura dos dados do arquivo" + erroDeLeitura);
         }
     }
 
