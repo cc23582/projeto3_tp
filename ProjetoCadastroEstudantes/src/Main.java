@@ -63,11 +63,10 @@ public class Main
     //Vamos ter que incluir as notas nesse método, pq se não o estudante fica sem notas o que faz dar erro no fazEstatistica
     public static void inclusao() throws Exception {
         String curso, ra = "99999", nome;
-        while (!ra.equals("00000"))
-        {
+        while (!ra.equals("00000")) {
             System.out.print("RA do estudante: (0) para terminar: ");
             int raDigitado = teclado.nextInt();
-            teclado.nextLine(); // limpa o \n pendente no buffer
+            teclado.nextLine(); // limpa o \n pendente
 
             if (raDigitado != 0) {
                 ra = String.format("%05d", raDigitado);
@@ -79,22 +78,39 @@ public class Main
                 } else {
                     System.out.print("Código do curso: ");
                     int cursoLido = teclado.nextInt();
-                    teclado.nextLine(); // limpa o \n pendente novamente
+                    teclado.nextLine();
 
                     curso = String.format("%02d", cursoLido);
 
                     System.out.print("Nome do estudante: ");
-                    nome = teclado.nextLine(); // permite nomes compostos
+                    nome = teclado.nextLine();
 
-                    // inclui em ordem crescente de RA
-                    estud.incluirEm(new Estudante(curso, ra, nome), estud.getOnde());
+                    Estudante novo = new Estudante(curso, ra, nome);
+
+                    // === inclusão das notas ===
+                    double[] notas = new double[15];
+                    int qn = 0;
+                    System.out.println("Digite as notas (0 a 10). Enter vazio para parar:");
+                    for (int i = 0; i < siglas.length; i++) {
+                        System.out.print(siglas[i] + ": ");
+                        String entrada = teclado.nextLine().trim();
+                        if (entrada.equals("")) break; // para antes das 15
+                        double nota = Double.parseDouble(entrada);
+                        novo.incluirNota(nota);
+                        qn++;
+                    }
+
+                    novo.setQuantasNotas(qn);
+
+                    estud.incluirEm(novo, estud.getOnde());
                     System.out.println("\nEstudante incluído.");
                 }
             } else {
-                ra = "00000"; // força saída do laço
+                ra = "00000"; // força saída
             }
         }
     }
+
 
     public static void exclusao() throws Exception
     {
@@ -156,37 +172,67 @@ public class Main
             linha += String.format("%-6s ", siglas[i]);
         return linha;
     }
-//Tem que ter opção para alterar as notas de cada matéria pra não der erro no fazEstatisticas
-    public static void alteracao() throws Exception {
-        while (true) {
-            System.out.print("RA do estudante (0 para terminar): ");
-            int raDigitado = teclado.nextInt();
-            teclado.nextLine();
-            if (raDigitado == 0) break;
 
-            String ra = String.format("%05d", raDigitado);
-            Estudante proc = new Estudante(ra);
+public static void alteracao() throws Exception {
+    while (true) {
+        System.out.print("RA do estudante (0 para terminar): ");
+        int raDigitado = teclado.nextInt();
+        teclado.nextLine();
+        if (raDigitado == 0) break;
 
-            if (!estud.existe(proc)) {
-                System.out.println("\nNão existe um estudante com este RA!");
-            } else {
-                Estudante atual = estud.valorDe(estud.getOnde());
-                System.out.println("Dados atuais:");
-                System.out.println(atual);
+        String ra = String.format("%05d", raDigitado);
+        Estudante proc = new Estudante(ra);
 
-                System.out.print("Novo código do curso ([Enter] para manter): ");
-                String novoCurso = teclado.nextLine();
-                if (!novoCurso.equals("")) atual.setCurso(novoCurso);
+        if (!estud.existe(proc)) {
+            System.out.println("\nNão existe um estudante com este RA!");
+        } else {
+            Estudante atual = estud.valorDe(estud.getOnde());
+            System.out.println("Dados atuais:");
+            System.out.println(atual);
 
-                System.out.print("Novo nome do estudante ([Enter] para manter): ");
-                String novoNome = teclado.nextLine();
-                if (!novoNome.equals("")) atual.setNome(novoNome);
+            System.out.print("Novo código do curso ([Enter] para manter): ");
+            String novoCurso = teclado.nextLine();
+            if (!novoCurso.equals("")) atual.setCurso(novoCurso);
 
-                estud.alterar(atual, estud.getOnde());
-                System.out.println("Estudante atualizado!");
+            System.out.print("Novo nome do estudante ([Enter] para manter): ");
+            String novoNome = teclado.nextLine();
+            if (!novoNome.equals("")) atual.setNome(novoNome);
+
+            // === alterar notas ===
+            System.out.println("Deseja alterar as notas? (s/n)");
+            String resp = teclado.nextLine().trim().toLowerCase();
+            if (resp.equals("s")) {
+                double[] notas = atual.getNotas();
+                int qn = atual.getQuantasNotas();
+
+                for (int i = 0; i < siglas.length; i++) {
+                    if (i < qn)
+                        System.out.print(siglas[i] + " (atual: " + notas[i] + ") [Enter p/ manter]: ");
+                    else
+                        System.out.print(siglas[i] + " (sem nota) [Enter p/ parar]: ");
+
+                    String entrada = teclado.nextLine().trim();
+                    if (entrada.equals("")) {
+                        if (i >= qn) break; // parar se não havia nota
+                        continue; // mantém se já existia
+                    }
+                    double novaNota = Double.parseDouble(entrada);
+                    if (i < qn)
+                        notas[i] = novaNota;
+                    else {
+                        atual.incluirNota(novaNota);
+                        qn++;
+                    }
+                }
+                atual.setQuantasNotas(qn);
             }
+
+            estud.alterar(atual, estud.getOnde());
+            System.out.println("Estudante atualizado!");
         }
     }
+}
+
 
     public static void irAoInicio() {
         estud.irAoInicio();
