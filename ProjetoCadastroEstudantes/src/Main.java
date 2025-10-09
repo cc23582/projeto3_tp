@@ -60,6 +60,7 @@ public class Main
         } while (opcao != 0);
     }
 
+    //Vamos ter que incluir as notas nesse método, pq se não o estudante fica sem notas o que faz dar erro no fazEstatistica
     public static void inclusao() throws Exception {
         String curso, ra = "99999", nome;
         while (!ra.equals("00000"))
@@ -127,10 +128,10 @@ public class Main
             if (raDigitado != 0) {
                 ra = String.format("%05d", raDigitado);
                 Estudante proc = new Estudante(ra);
-                if (!estud.existe(proc)) {   // ajusta valor de ondeEsta
+                if (!estud.existe(proc)) {
                     System.out.println("\nRA não encontrado!");
                 } else {
-                    // mostra cabeçalho e estudante
+
                     System.out.println(cabecalhoNotas());
                     System.out.println(estud.valorDe(estud.getOnde()));
                 }
@@ -155,7 +156,7 @@ public class Main
             linha += String.format("%-6s ", siglas[i]);
         return linha;
     }
-
+//Tem que ter opção para alterar as notas de cada matéria pra não der erro no fazEstatisticas
     public static void alteracao() throws Exception {
         while (true) {
             System.out.print("RA do estudante (0 para terminar): ");
@@ -220,12 +221,12 @@ public class Main
 
         System.out.println("\n===== Estatísticas =====");
 
-        //Dados básicos de cada disciplina
+
         double[] mediasDisc = calculaMediasPorDisciplina();
         int[] aprovados = contaAprovados();
         int[] retidos = contaRetidos();
 
-        // Disciplinas com destaque
+
         int discMaisAprov = indiceMaiorValor(aprovados);
         int discMaisRetidos = indiceMaiorValor(retidos);
         int discMaiorMedia = indiceMaiorValor(mediasDisc);
@@ -234,25 +235,26 @@ public class Main
         System.out.println("Disciplina com MAIS aprovações: " + siglas[discMaisAprov]);
         System.out.println("Disciplina com MAIS retenções: " + siglas[discMaisRetidos]);
 
-        //Melhor aluno geral
+
         Estudante melhorAluno = alunoComMaiorMedia();
         System.out.println("Aluno com MAIOR média: " + melhorAluno.getNome().trim() +
                 " (" + melhorAluno.getRa().trim() + ") com média " +
                 String.format("%.2f", melhorAluno.mediaDasNotas()));
 
-        //Disciplinas com maior e menor nota do melhor aluno
+
         mostraMaiorEMenorNotaDoMelhorAluno(melhorAluno);
 
-        //Médias gerais
+
         System.out.println("\nMédias por disciplina:");
         for (int j = 0; j < siglas.length; j++)
             System.out.printf("%-7s: %.2f\n", siglas[j], mediasDisc[j]);
 
-        //Alunos com notas destaque nas disciplinas extremas
+
         mostraDestaquesNasDisciplinasExtremas(discMenorMedia, discMaiorMedia);
     }
 
-    /* ======== MÉTODOS AUXILIARES ======== */
+
+//=========== Métodos para o fazEstatisticas()========
 
     // Calcula média aritmética das disciplinas
     private static double[] calculaMediasPorDisciplina() throws Exception {
@@ -274,7 +276,7 @@ public class Main
         return medias;
     }
 
-    // Conta quantos alunos foram aprovados (nota >= 6)
+    // conta os alunos aprovados
     private static int[] contaAprovados() throws Exception {
         int[] aprovados = new int[15];
         for (int i = 0; i < estud.getTamanho(); i++) {
@@ -285,7 +287,7 @@ public class Main
         return aprovados;
     }
 
-    // Conta quantos alunos foram retidos (nota < 6)
+    // conta quantos alunos foram retidos
     private static int[] contaRetidos() throws Exception {
         int[] retidos = new int[15];
         for (int i = 0; i < estud.getTamanho(); i++) {
@@ -296,7 +298,7 @@ public class Main
         return retidos;
     }
 
-    // Retorna índice do maior valor em vetor de double
+    // Retorna í do maior valor em vetor de double
     private static int indiceMaiorValor(double[] v) {
         int indice = 0;
         for (int i = 1; i < v.length; i++)
@@ -304,7 +306,7 @@ public class Main
         return indice;
     }
 
-    // Retorna índice do menor valor em vetor de double
+    // Retorna í do menor valor em vetor de double
     private static int indiceMenorValor(double[] v) {
         int indice = 0;
         for (int i = 1; i < v.length; i++)
@@ -312,7 +314,7 @@ public class Main
         return indice;
     }
 
-    // Retorna índice do maior valor em vetor de int
+    // Retorna í do maior valor em vetor de int
     private static int indiceMaiorValor(int[] v) {
         int indice = 0;
         for (int i = 1; i < v.length; i++)
@@ -320,7 +322,7 @@ public class Main
         return indice;
     }
 
-    // Retorna o aluno com a maior média geral
+    // retorna o aluno com a maior média geral
     private static Estudante alunoComMaiorMedia() throws Exception {
         Estudante melhor = null;
         double maior = -1;
@@ -350,7 +352,7 @@ public class Main
         System.out.println("Menor nota do melhor aluno: " + siglas[menor]);
     }
 
-    // Mostra quem se destacou nas disciplinas com maior e menor média
+    // Mostra o pior e melhor aluno
     private static void mostraDestaquesNasDisciplinasExtremas(int discMenorMedia, int discMaiorMedia) throws Exception {
         double maiorNotaNaMenor = -1, menorNotaNaMaior = 11;
         Estudante alunoMaiorNaMenor = null, alunoMenorNaMaior = null;
