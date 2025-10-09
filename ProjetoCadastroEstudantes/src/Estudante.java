@@ -5,9 +5,9 @@ public class Estudante
 {
     @Override
     public String toString() {
-        String saida = " " + curso + "   " + ra + "  " + nome + "    " + quantasNotas+" ";
+        String saida = curso + "    " + ra + "  " + nome + "   " + quantasNotas+"  ";
         for (int indice=0; indice < quantasNotas; indice++)
-            saida += String.format("%4.1f",notas[indice]);
+            saida += String.format("%04.1f   ",notas[indice]);
         return saida;
     }
 
@@ -103,6 +103,44 @@ public class Estudante
 
     // throws Exception informa que poderá ocorrer um erro na leitura de arquivo
     public boolean leuLinhaDoArquivo(BufferedReader arq) throws Exception {
+        if (arq != null)    // se arquivo de entrada está aberto (pela aplicação)
+        {
+            String linhaDoArquivo = arq.readLine();
+
+            if (linhaDoArquivo != null) {
+                String c = linhaDoArquivo.substring(0, 2);  // separa índices de 0 a 1
+                String r = linhaDoArquivo.substring(2, 7);  // separa índices de 2 a 6
+                String n = linhaDoArquivo.substring(7, 37); // separa índices de 7 a 36
+                String sqn = linhaDoArquivo.substring(37, 39);  // separa 2 caracteres
+                int qn = Integer.parseInt(sqn);                 // converte sqn para int
+                setNotas(new double[15]);   // cria vetor de notas do estudante com 15 posições
+
+                // armazenamos os valores já conhecidos para os atributos de Estudante:
+                setCurso(c);
+                setRa(r);
+                setNome(n);
+                setQuantasNotas(qn);
+
+                // separamos da linha lida do arquivo, tantas notas quanto o valor de qn
+                // e cada nota separada é atribuída a uma posição do vetor interno notas
+                int inicioNota = 39; // posição inicial da 1a nota
+                for (int indNota = 0; indNota < qn; indNota++) {
+                    String umaNota = linhaDoArquivo.substring(inicioNota, inicioNota + 4);
+                    notas[indNota] = Double.parseDouble(umaNota); // converte para real
+                    inicioNota += 4; // posiciona no início da próxima nota
+                }
+                return true;  // conseguimos ler uma linha e separar os atributos
+            }
+            else
+                return false;   // erro na linha lida, está vazia
+        }
+
+        return false;   // arquivo fechado
+    }
+
+    /*
+    // throws Exception informa que poderá ocorrer um erro na leitura de arquivo
+    public boolean leuLinhaDoArquivo(BufferedReader arq) throws Exception {
         if (arq == null) {
             return false;
         } else {
@@ -171,7 +209,7 @@ public class Estudante
                 }
             }
         }
-    }
+    }*/
 
 
 

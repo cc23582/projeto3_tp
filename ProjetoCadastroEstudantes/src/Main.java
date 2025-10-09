@@ -98,11 +98,12 @@ public class Main
     public static void exclusao() throws Exception
     {
         String ra = "99999";
-        while (ra != "00000") {
+        while (!ra.equals("00000")) {
             System.out.print("RA do estudante: (0) para terminar: ");
             int raDigitado = teclado.nextInt();
+            ra = String.format("%05d", raDigitado);
+
             if (raDigitado != 0) {
-                ra = String.format("%05d", raDigitado);
                 // temos de pesquisar esse ra no vetor para descobrirmos
                 // em que índice ele está para podermos excluir desse índice
                 // criamos um objeto Estudante para poder chamar o método existe()
@@ -149,9 +150,9 @@ public class Main
     }
 
     public static String cabecalhoNotas() {
-        String linha = "Curso  RA    Nome                           Qn ";
+        String linha = "Curso RA     Nome                             Qn ";
         for (int i = 0; i < 15; i++)
-            linha += String.format("%-6s", siglas[i]);
+            linha += String.format("%-6s ", siglas[i]);
         return linha;
     }
 
@@ -307,7 +308,7 @@ public class Main
     private static int indiceMenorValor(double[] v) {
         int indice = 0;
         for (int i = 1; i < v.length; i++)
-            if (v[i] < v[indice]) indice = i;
+            if (v[i] < v[indice] && v[i] != 0) indice = i;
         return indice;
     }
 
@@ -315,7 +316,7 @@ public class Main
     private static int indiceMaiorValor(int[] v) {
         int indice = 0;
         for (int i = 1; i < v.length; i++)
-            if (v[i] > v[indice]) indice = i;
+            if (v[i] > v[indice] && v[i] != 0) indice = i;
         return indice;
     }
 
@@ -358,23 +359,32 @@ public class Main
             Estudante e = estud.valorDe(i);
             double[] notas = e.getNotas();
 
-            if (e.getQuantasNotas() > discMenorMedia && notas[discMenorMedia] > maiorNotaNaMenor) {
-                maiorNotaNaMenor = notas[discMenorMedia];
-                alunoMaiorNaMenor = e;
+            if (e.getQuantasNotas() > discMenorMedia) {
+                if (notas[discMenorMedia] > maiorNotaNaMenor) {
+                    maiorNotaNaMenor = notas[discMenorMedia];
+                    alunoMaiorNaMenor = e;
+                }
             }
 
-            if (e.getQuantasNotas() > discMaiorMedia && notas[discMaiorMedia] < menorNotaNaMaior) {
-                menorNotaNaMaior = notas[discMaiorMedia];
-                alunoMenorNaMaior = e;
+            if (e.getQuantasNotas() > discMaiorMedia) {
+                if (notas[discMaiorMedia] < menorNotaNaMaior) {
+                    menorNotaNaMaior = notas[discMaiorMedia];
+                    alunoMenorNaMaior = e;
+                }
             }
         }
 
-        System.out.println("\nNa disciplina com MENOR média (" + siglas[discMenorMedia] +
-                "), o aluno com MAIOR nota foi: " + alunoMaiorNaMenor.getNome().trim() +
-                " (" + String.format("%.1f", maiorNotaNaMenor) + ")");
-        System.out.println("Na disciplina com MAIOR média (" + siglas[discMaiorMedia] +
-                "), o aluno com MENOR nota foi: " + alunoMenorNaMaior.getNome().trim() +
-                " (" + String.format("%.1f", menorNotaNaMaior) + ")");
+        if (alunoMenorNaMaior != null) {
+            System.out.println("\nNa disciplina com MENOR média (" + siglas[discMenorMedia] +
+                    "), o aluno com MAIOR nota foi: " + alunoMaiorNaMenor.getNome().trim() +
+                    " (" + String.format("%.1f", maiorNotaNaMenor) + ")");
+        }
+
+        if (alunoMaiorNaMenor != null) {
+            System.out.println("Na disciplina com MAIOR média (" + siglas[discMaiorMedia] +
+                    "), o aluno com MENOR nota foi: " + alunoMenorNaMaior.getNome().trim() +
+                    " (" + String.format("%.1f", menorNotaNaMaior) + ")");
+        }
     }
 
 }
