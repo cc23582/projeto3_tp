@@ -63,7 +63,7 @@ public class Main
     //Vamos ter que incluir as notas nesse método, pq se não o estudante fica sem notas o que faz dar erro no fazEstatistica
     public static void inclusao() throws Exception {
         String curso, ra = "99999", nome;
-        while (!ra.equals("00000")) {
+        while (!ra.equals("00000")) { //mudamos para equals
             System.out.print("RA do estudante: (0) para terminar: ");
             int raDigitado = teclado.nextInt();
             teclado.nextLine(); // limpa o \n pendente
@@ -71,20 +71,21 @@ public class Main
             if (raDigitado != 0) {
                 ra = String.format("%05d", raDigitado);
 
-                // verifica se já existe o RA
+                // não podemos ter ra repetido, temos de pesquisá-lo no vetor
+                // antes de prosseguir a inclusão:
+                // criamos um objeto Estudante para poder chamar o método existe()
                 Estudante proc = new Estudante(ra);
-                if (estud.existe(proc)) {
+                if (estud.existe(proc)) {       // ajusta valor de ondeEsta
                     System.out.println("\nRA repetido!");
-                } else {
+                } else {        // ra não repetido, lemos os demais dados
                     System.out.print("Código do curso: ");
                     int cursoLido = teclado.nextInt();
                     teclado.nextLine();
-
                     curso = String.format("%02d", cursoLido);
-
                     System.out.print("Nome do estudante: ");
                     nome = teclado.nextLine();
-
+                    // inclui em ordem crescente de ra, usando o valor de ondeEsta
+                    // como índice de inclusão do novo estudante
                     Estudante novo = new Estudante(curso, ra, nome);
 
                     // === inclusão das notas ===
@@ -99,14 +100,13 @@ public class Main
                         novo.incluirNota(nota);
                         qn++;
                     }
-
                     novo.setQuantasNotas(qn);
-
                     estud.incluirEm(novo, estud.getOnde());
                     System.out.println("\nEstudante incluído.");
                 }
-            } else {
-                ra = "00000"; // força saída
+            } else
+            {
+                ra = "00000";
             }
         }
     }
@@ -115,7 +115,7 @@ public class Main
     public static void exclusao() throws Exception
     {
         String ra = "99999";
-        while (!ra.equals("00000")) {
+        while (!ra.equals("00000")) { //mudamos para equals
             System.out.print("RA do estudante: (0) para terminar: ");
             int raDigitado = teclado.nextInt();
             ra = String.format("%05d", raDigitado);
@@ -182,7 +182,6 @@ public static void alteracao() throws Exception {
 
         String ra = String.format("%05d", raDigitado);
         Estudante proc = new Estudante(ra);
-
         if (!estud.existe(proc)) {
             System.out.println("\nNão existe um estudante com este RA!");
         } else {
@@ -193,12 +192,11 @@ public static void alteracao() throws Exception {
             System.out.print("Novo código do curso ([Enter] para manter): ");
             String novoCurso = teclado.nextLine();
             if (!novoCurso.equals("")) atual.setCurso(novoCurso);
-
             System.out.print("Novo nome do estudante ([Enter] para manter): ");
             String novoNome = teclado.nextLine();
             if (!novoNome.equals("")) atual.setNome(novoNome);
 
-            // === alterar notas ===
+            // === alterar notas =====
             System.out.println("Deseja alterar as notas? (s/n)");
             String resp = teclado.nextLine().trim().toLowerCase();
             if (resp.equals("s")) {
@@ -210,7 +208,6 @@ public static void alteracao() throws Exception {
                         System.out.print(siglas[i] + " (atual: " + notas[i] + ") [Enter p/ manter]: ");
                     else
                         System.out.print(siglas[i] + " (sem nota) [Enter p/ parar]: ");
-
                     String entrada = teclado.nextLine().trim();
                     if (entrada.equals("")) {
                         if (i >= qn) break; // parar se não havia nota
@@ -226,14 +223,11 @@ public static void alteracao() throws Exception {
                 }
                 atual.setQuantasNotas(qn);
             }
-
             estud.alterar(atual, estud.getOnde());
             System.out.println("Estudante atualizado!");
         }
     }
 }
-
-
     public static void irAoInicio() {
         estud.irAoInicio();
         System.out.println(estud.valorDe(estud.getPosicaoAtual()));
@@ -266,13 +260,9 @@ public static void alteracao() throws Exception {
         }
 
         System.out.println("\n===== Estatísticas =====");
-
-
         double[] mediasDisc = calculaMediasPorDisciplina();
         int[] aprovados = contaAprovados();
         int[] retidos = contaRetidos();
-
-
         int discMaisAprov = indiceMaiorValor(aprovados);
         int discMaisRetidos = indiceMaiorValor(retidos);
         int discMaiorMedia = indiceMaiorValor(mediasDisc);
@@ -281,32 +271,25 @@ public static void alteracao() throws Exception {
         System.out.println("Disciplina com MAIS aprovações: " + siglas[discMaisAprov]);
         System.out.println("Disciplina com MAIS retenções: " + siglas[discMaisRetidos]);
 
-
         Estudante melhorAluno = alunoComMaiorMedia();
         System.out.println("Aluno com MAIOR média: " + melhorAluno.getNome().trim() +
                 " (" + melhorAluno.getRa().trim() + ") com média " +
                 String.format("%.2f", melhorAluno.mediaDasNotas()));
-
-
         mostraMaiorEMenorNotaDoMelhorAluno(melhorAluno);
-
-
         System.out.println("\nMédias por disciplina:");
         for (int j = 0; j < siglas.length; j++)
             System.out.printf("%-7s: %.2f\n", siglas[j], mediasDisc[j]);
-
 
         mostraDestaquesNasDisciplinasExtremas(discMenorMedia, discMaiorMedia);
     }
 
 
-//=========== Métodos para o fazEstatisticas()========
+//======================= Métodos para o fazEstatisticas()========
 
-    // Calcula média aritmética das disciplinas
+    // Calcula a média aritmética das disciplinas
     private static double[] calculaMediasPorDisciplina() throws Exception {
         double[] soma = new double[15];
         int[] cont = new int[15];
-
         for (int i = 0; i < estud.getTamanho(); i++) {
             Estudante e = estud.valorDe(i);
             double[] notas = e.getNotas();
@@ -315,7 +298,6 @@ public static void alteracao() throws Exception {
                 cont[j]++;
             }
         }
-
         double[] medias = new double[15];
         for (int j = 0; j < 15; j++)
             medias[j] = cont[j] > 0 ? soma[j] / cont[j] : 0;
@@ -383,7 +365,7 @@ public static void alteracao() throws Exception {
         return melhor;
     }
 
-    // Exibe a disciplina de maior e menor nota do melhor aluno
+    // Exibe as diciplina de maior e menor nota do melhor aluno
     private static void mostraMaiorEMenorNotaDoMelhorAluno(Estudante e) throws Exception {
         double[] notas = e.getNotas();
         int qn = e.getQuantasNotas();
@@ -402,10 +384,11 @@ public static void alteracao() throws Exception {
     private static void mostraDestaquesNasDisciplinasExtremas(int discMenorMedia, int discMaiorMedia) throws Exception {
         double maiorNotaNaMenor = -1, menorNotaNaMaior = 11;
         Estudante alunoMaiorNaMenor = null, alunoMenorNaMaior = null;
-
         for (int i = 0; i < estud.getTamanho(); i++) {
             Estudante e = estud.valorDe(i);
             double[] notas = e.getNotas();
+
+
 
             if (e.getQuantasNotas() > discMenorMedia) {
                 if (notas[discMenorMedia] > maiorNotaNaMenor) {
@@ -413,7 +396,6 @@ public static void alteracao() throws Exception {
                     alunoMaiorNaMenor = e;
                 }
             }
-
             if (e.getQuantasNotas() > discMaiorMedia) {
                 if (notas[discMaiorMedia] < menorNotaNaMaior) {
                     menorNotaNaMaior = notas[discMaiorMedia];
@@ -427,7 +409,6 @@ public static void alteracao() throws Exception {
                     "), o aluno com MAIOR nota foi: " + alunoMaiorNaMenor.getNome().trim() +
                     " (" + String.format("%.1f", maiorNotaNaMenor) + ")");
         }
-
         if (alunoMaiorNaMenor != null) {
             System.out.println("Na disciplina com MAIOR média (" + siglas[discMaiorMedia] +
                     "), o aluno com MENOR nota foi: " + alunoMenorNaMaior.getNome().trim() +
